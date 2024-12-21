@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register & Login</title>
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      background-color: #0d0d1a;
+      color: #fff;
+      overflow: hidden;
+    }
+    .container {
+      width: 320px;
+      padding: 20px;
+      background-color: transparent;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
+    input[type="text"], input[type="email"], input[type="password"] {
+      width: calc(100% - 15px);
+      padding: 12px;
+      margin: 12px 0;
+      background: #1e1e38;
+      border: none;
+      color: #ffffff;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    input[type="submit"] {
+      width: calc(100% - 15px);
+      padding: 12px;
+      background-color: #3d3d73;
+      border: none;
+      color: #ffffff;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+    input[type="submit"]:hover {
+      background-color: #5c5c9a;
+    }
+    .notification {
+      display: none;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      position: relative;
+      text-align: center;
+    }
+    .success {
+      background-color: #4caf50;
+      color: white;
+    }
+    .error {
+      background-color: #f44336;
+      color: white;
+    }
+    .switch-link {
+      margin-top: 15px;
+      color: #5c5c9a;
+      cursor: pointer;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Form Login -->
+  <div class="container" id="loginForm" style="display: block;">
+    <h2>Login</h2>
+    <div id="loginNotification" class="notification"></div>
+    <input type="email" id="loginEmail" placeholder="Email" required autocomplete="email">
+    <input type="password" id="loginPassword" placeholder="Password" required autocomplete="current-password">
+    <input class="anu" type="submit" value="Login" onclick="login()">
+    <p id="loginMessage"></p>
+    <p class="switch-link" onclick="toggleForms()">
+      Belum punya akun? Daftar di sini
+    </p>
+    <a href="/profile">Profile</a><span>&nbsp;&nbsp;&nbsp;</span>
+    <a href="/logout">Logout</a><span>&nbsp;&nbsp;&nbsp;</span>
+    <a href="/docs">Dashboard</a>
+  </div>
+
+  <!-- Form Register -->
+  <div class="container" id="registerForm" style="display: none;">
+    <h2>Register</h2>
+    <div id="registerNotification" class="notification"></div>
+    <input type="text" id="registerUsername" placeholder="Username" required>
+    <input type="email" id="registerEmail" placeholder="Email" required autocomplete="email">
+    <input type="password" id="registerPassword" placeholder="Password" required autocomplete="new-password">
+    <input type="submit" value="Register" onclick="register()">
+    <p id="registerMessage"></p>
+    <p class="switch-link" onclick="toggleForms()">
+      Sudah punya akun? Login di sini
+    </p>
+    <a href="/profile">Profile</a><span>&nbsp;&nbsp;&nbsp;</span>
+    <a href="/">Dashboard</a>
+  </div>
+
+  <script>
+    function toggleForms() {
+      const registerForm = document.getElementById('registerForm');
+      const loginForm = document.getElementById('loginForm');
+      if (registerForm.style.display === "none") {
+        registerForm.style.display = "block";
+        loginForm.style.display = "none";
+      } else {
+        registerForm.style.display = "none";
+        loginForm.style.display = "block";
+      }
+    }
+
+    function showNotification(message, type, form) {
+      const notification = document.getElementById(form === 'register' ? 'registerNotification' : 'loginNotification');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      notification.style.display = 'block';
+      setTimeout(() => {
+        notification.style.display = 'none';
+      }, 5000);
+    }
+
+    function register() {
+      const username = document.getElementById('registerUsername').value;
+      const email = document.getElementById('registerEmail').value;
+      const password = document.getElementById('registerPassword').value;
+
+      fetch('/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, email, password })
+      })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('registerMessage').textContent = data.message;
+        showNotification(data.message, data.success ? "success" : "error", 'register');
+        if (data.success) {
+          setTimeout(() => {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+          }, 5000);
+        }
+      });
+    }
+
+    function login() {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('loginMessage').textContent = data.message;
+        showNotification(data.message, data.success ? "success" : "error", 'login');
+        if (data.success) {
+          // Alihkan ke dashboard setelah login berhasil
+          setTimeout(() => {
+            window.location.href = '/docs'; // Ganti dengan URL dashboard yang sesuai
+          }, 5000);
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>

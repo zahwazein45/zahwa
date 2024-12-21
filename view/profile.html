@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Profile</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css?family=DM+Sans:400,500|Jost:400,500,600&display=swap");
+
+    body {
+      font-family: "Jost", sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start; /* Align at the top */
+      height: 100vh;
+      margin: 0;
+      overflow-y: auto; /* Enable vertical scrolling */
+      overflow-x: hidden; /* Prevent horizontal scrolling */
+    }
+
+    #profile-container {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      max-width: 500px;
+      width: 100%; /* Ensure responsiveness */
+      box-sizing: border-box; /* Include padding in width */
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    button, .back-link {
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      text-align: center;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover, .back-link:hover {
+      background-color: #0056b3;
+    }
+
+    .back-link {
+      background-color: #6c757d; /* Gray color for back link */
+      font-size: 0.9em; /* Smaller font size */
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+      word-wrap: break-word; /* Allow long words to break */
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .glow {
+      color: #007bff;
+      font-weight: bold;
+    }
+
+    .logout {
+      display: block;
+      margin: 10px auto;
+      text-align: center;
+      color: red; /* Red color for logout */
+      font-size: 0.9em; /* Smaller font size */
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="profile-container">
+    <h2>User Profile</h2>
+    <span id="loading-message">Loading...</span>
+    
+    <div class="button-container">
+      <a href="/docs" class="back-link">🏠 Home</a>
+      <button onclick="yayaya()">🔄 Refresh</button>
+    </div>
+    
+    <table id="profile-table">
+      <tbody>
+        <!-- Profile data will be injected here -->
+      </tbody>
+    </table>
+    
+    <a href="/logout" class="logout">Logout</a> <!-- Moved to the bottom -->
+  </div>
+
+  <script>
+    async function yayaya() {
+      document.getElementById('loading-message').style.display = 'block'; // Show loading message
+      try {
+        const response = await fetch('/prof');
+        if (response.ok) {
+          const data = await response.json();
+          const { userProfile, totalUsers } = data;
+
+          // Fetch IP Address
+          const ipResponse = await fetch('https://api.ipify.org?format=json');
+          const ipData = await ipResponse.json();
+          const ipAddress = ipData.ip;
+          console.log(ipAddress)
+          document.getElementById('profile-table').innerHTML = `
+            <tr>
+              <th>🌐 My Address</th>
+              <td class="glow">${ipAddress}</td>
+            </tr>
+            <tr>
+              <th>👥 Total Users</th>
+              <td class="glow">${325 + totalUsers}</td>
+            </tr>
+            <tr>
+              <th>👤 Username</th>
+              <td class="glow">${userProfile.username}</td>
+            </tr>
+            <tr>
+              <th>📧 Email</th>
+              <td class="glow">${userProfile.email}</td>
+            </tr>
+            <tr>
+              <th>🔑 API Key</th>
+              <td class="glow">${userProfile.authKey}</td>
+            </tr>
+            <tr>
+              <th>🎟 Limit</th>
+              <td class="glow">${userProfile.limit}</td>
+            </tr>           
+            <tr>
+              <th>🔗 Example Input Key</th>
+              <td class="glow" style="word-break: break-all;">https://ruhend-api.mywire.org/api/ttdl?key=yourkey&url=yourlink</td>
+            </tr>
+            <tr>
+              <th>📄 Description</th>
+              <td class="glow" style="word-break: break-all;">🎟 Limit will be reset<br>every 23:00 or 11 PM<br> Time Asia/Jakarta</td>
+            </tr>
+          `;
+          document.getElementById('loading-message').style.display = 'none'; // Hide loading message
+        } else {
+          document.getElementById('profile-table').innerHTML = `
+            <tr><td colspan="2" class="glow">Are You Online, Sensei?</td></tr>`;
+          document.getElementById('loading-message').style.display = 'none'; // Hide loading message
+        }
+      } catch (e) {
+        document.getElementById('profile-table').innerHTML = `
+          <tr><td colspan="2" class="glow">Are you online, Sensei?</td></tr>`;
+        document.getElementById('loading-message').style.display = 'none'; // Hide loading message
+      }
+    }
+
+    yayaya();
+  </script>
+</body>
+</html>
