@@ -15,7 +15,7 @@ async function readDataFromFirebase() {
         const snapshot = await ref.once('value');
         const response = await snapshot.val();
         const data = await JSON.parse(response);
-        console.log('Readed √\n' + JSON.stringify(data, 0, 2));
+       // console.log('Readed √\n' + JSON.stringify(data, 0, 2));
         //fs.writeFileSync('./database.json', JSON.stringify(data, 0, 2))
         return data
     } catch (error) {
